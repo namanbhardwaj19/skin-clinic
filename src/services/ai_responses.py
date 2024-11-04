@@ -2003,8 +2003,10 @@ def save_unanswered_questions_to_sheet(unanswered_question, user_phone):
         "https://spreadsheets.google.com/feeds",
         "https://www.googleapis.com/auth/drive"
     ]
-    creds = ServiceAccountCredentials.from_json_keyfile_name(
-        GOOGLE_SERVICE_ACCOUNT_URL, scope)
+    credentials_info = json.loads(base64.b64decode(GOOGLE_SERVICE_ACCOUNT_URL))
+
+    # Create the credentials object from the JSON dictionary
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(credentials_info, scope)
     client = gspread.authorize(creds)
     # Open the specific Google Sheet (worksheet 1 assumed for unanswered questions)
     sheet = client.open_by_url(GOOGLE_SHEET_URL_FOR_UNANSWERED_QUESTIONS)
@@ -2021,8 +2023,8 @@ def save_user_details_to_sheets(data, user_phone):
         "https://spreadsheets.google.com/feeds",
         'https://www.googleapis.com/auth/drive'
     ]
-    creds = ServiceAccountCredentials.from_json_keyfile_name(
-        GOOGLE_SERVICE_ACCOUNT_URL, scope)
+    credentials_info = json.loads(base64.b64decode(GOOGLE_SERVICE_ACCOUNT_URL))
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(credentials_info, scope)
     client = gspread.authorize(creds)
     sheet = client.open_by_url(GOOGLE_SHEET_URL_FOR_CALL_BACK_REQUESTS)
     sheet = sheet.sheet1
@@ -2039,8 +2041,13 @@ def save_user_details_to_sheets(data, user_phone):
 
 # Function to create a service for the Gmail API
 def create_gmail_service():
-    credentials = service_account.Credentials.from_service_account_file(
-        filename=SATORIAI_GMAIL_KEY, scopes=SCOPES)
+    # Decode the Base64 string back to JSON and load it
+    credentials_info = json.loads(base64.b64decode(SATORIAI_GMAIL_KEY))
+
+    # Create the service account credentials object from the JSON data
+    credentials = service_account.Credentials.from_service_account_info(
+        credentials_info, scopes=SCOPES
+    )
 
     # Delegating authority to impersonate the user
     delegated_credentials = credentials.with_subject(IMPERSONATED_USER)
