@@ -15,11 +15,11 @@ whatsapp = APIRouter(
     prefix="/v1"
 )
 
-account_sid = os.environ.get("ACCOUNT_SID")
-auth_token = os.environ.get("AUTH_TOKEN")
-twilio_number_code = os.environ.get("TWILIO_NUMBER_CODE")
-OPEN_AI_API_KEY = os.environ.get("OPEN_AI_API_KEY")
-TWILIO_PHONE_NUMBER = os.environ.get("TWILIO_PHONE_NUMBER")
+account_sid = os.getenv("ACCOUNT_SID")
+auth_token = os.getenv("AUTH_TOKEN")
+twilio_number_code = os.getenv("TWILIO_NUMBER_CODE")
+OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
+TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
 
 
 twilio_client = Client(account_sid, auth_token)
