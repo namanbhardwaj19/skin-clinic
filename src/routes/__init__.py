@@ -21,6 +21,7 @@ auth_token = os.getenv("AUTH_TOKEN")
 twilio_number_code = os.getenv("TWILIO_NUMBER_CODE")
 OPEN_AI_API_KEY = os.getenv("OPEN_AI_API_KEY")
 TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
+WHATSAPP_GREETING_ID = os.getenv("WHATSAPP_GREETING_ID")
 
 
 twilio_client = Client(account_sid, auth_token)
@@ -84,12 +85,12 @@ class WhatsAppRequest(BaseModel):
 @whatsapp.post('/web/whatsapp')
 def request_whatsapp(payload: WhatsAppRequest):
     logger.info(f"User message (Text) : {payload.Body}")
-    responses = get_ai_response(user_phone=payload.From, message=payload.Body)
     twilio_client.messages.create(
-        body="Hi,Thanks for contacting us on our website.",
+        content_sid=WHATSAPP_GREETING_ID,
         from_=TWILIO_PHONE_NUMBER,
         to=f"whatsapp:+91{payload.From}"
     )
+    responses = get_ai_response(user_phone=payload.From, message=payload.Body)
     pattern = r'【\d+:\d+†[^\]]+】'
     for response in responses:
         response = re.sub(pattern, '', response)
