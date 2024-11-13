@@ -85,12 +85,13 @@ class WhatsAppRequest(BaseModel):
 @whatsapp.post('/web/whatsapp')
 def request_whatsapp(payload: WhatsAppRequest):
     logger.info(f"User message (Text) : {payload.Body}")
+    responses = get_ai_response(user_phone=payload.From, message=payload.Body)
     twilio_client.messages.create(
         content_sid=WHATSAPP_GREETING_ID,
         from_=TWILIO_PHONE_NUMBER,
         to=f"whatsapp:+91{payload.From}"
     )
-    responses = get_ai_response(user_phone=payload.From, message=payload.Body)
+    
     pattern = r'【\d+:\d+†[^\]]+】'
     for response in responses:
         response = re.sub(pattern, '', response)
