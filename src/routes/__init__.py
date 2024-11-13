@@ -85,7 +85,7 @@ class WhatsAppRequest(BaseModel):
 @whatsapp.post('/web/whatsapp')
 def request_whatsapp(payload: WhatsAppRequest):
     logger.info(f"User message (Text) : {payload.Body}")
-    responses = get_ai_response(user_phone=payload.From, message=payload.Body)
+    responses = get_ai_response(user_phone=f"whatsapp:+91{payload.From}", message=payload.Body)
     twilio_client.messages.create(
         content_sid=WHATSAPP_GREETING_ID,
         from_=TWILIO_PHONE_NUMBER,
