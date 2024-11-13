@@ -2,6 +2,7 @@ import mimetypes
 import re
 import os
 import requests
+from pydantic import BaseModel
 from fastapi import Request, APIRouter
 from fastapi.logger import logger
 from openai import OpenAI
@@ -70,6 +71,34 @@ async def whatsapp_endpoint(request: Request):
         return MessagingResponse()
     except Exception as e:
         logger.error(f"Got an exception - {e}")
+
+
+
+
+class WhatsAppRequest(BaseModel):
+    From: str
+    Body: str
+    isWebRequest: bool
+
+
+@whatsapp.post('/web/whatsapp')
+def request_whatsapp(payload: WhatsAppRequest):
+    logger.info(f"User message (Text) : {payload.Body}")
+    responses = get_ai_response(user_phone=payload.From, message=payload.Body)
+    twilio_client.messages.create(
+        body="Hi,Thanks for contacting us on our website.",
+        from_=TWILIO_PHONE_NUMBER,
+        to=f"whatsapp:+91{payload.From}"
+    )
+    pattern = r'【\d+:\d+†[^\]]+】'
+    for response in responses:
+        response = re.sub(pattern, '', response)
+        twilio_client.messages.create(
+            body=response,
+            from_=TWILIO_PHONE_NUMBER,
+            to=f"whatsapp:+91{payload.From}"
+        )
+    return True
 
 
 def transcribe_audio(media_url):
